@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Is AI doing your thinking?</title>
+<meta name="description" content="A 4-minute self-check of whether AI and other tech support your thinking or replace it. Built on published research, for adults of any age.">
+<meta property="og:title" content="Is AI doing your thinking?">
+<meta property="og:description" content="A 4-minute self-check built on published research. Find out whether AI supports your thinking or replaces it.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232346B8'/><path d='M7 22h18M9 22V18M13 22V13M17 22V16M21 22V10' stroke='white' stroke-width='2.4' stroke-linecap='round'/></svg>">
+<style>
+/* Layout idea: a measurement instrument on graph paper. One column, item IDs and a ruled scale as the signature detail. */
+:root{
+  --bg:#EDF0F2;
+  --grid:rgba(35,70,184,.06);
+  --surface:#FFFFFF;
+  --ink:#13202A;
+  --muted:#55636E;
+  --line:#CBD3D9;
+  --accent:#2346B8;
+  --accent-soft:#E2E8FA;
+  --on-accent:#FFFFFF;
+  --good:#2E7D5B;
+  --warn:#A86A12;
+  --bad:#B23A3A;
+  --display:"Newsreader",Georgia,"Times New Roman",serif;
+  --body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  --r:10px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0F171D; --grid:rgba(143,168,255,.05); --surface:#17222A; --ink:#E6ECF0; --muted:#9AA8B2;
+    --line:#2B3A45; --accent:#8FA8FF; --accent-soft:#1E2A4D; --on-accent:#0F171D;
+    --good:#5CC197; --warn:#E0A84A; --bad:#EF7B7B; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F171D; --grid:rgba(143,168,255,.05); --surface:#17222A; --ink:#E6ECF0; --muted:#9AA8B2;
+  --line:#2B3A45; --accent:#8FA8FF; --accent-soft:#1E2A4D; --on-accent:#0F171D;
+  --good:#5CC197; --warn:#E0A84A; --bad:#EF7B7B; color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:24px 24px;
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:18px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+main{max-width:720px;margin:0 auto;padding:20px 16px 72px}
+.screen{display:none}
+.screen.active{display:block}
+h1,h2,h3{font-family:var(--display);font-weight:600;line-height:1.12;text-wrap:balance;margin:0}
+p{margin:0}
+a{color:var(--accent);text-underline-offset:3px}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+.mono{font-family:var(--mono);font-size:13px;letter-spacing:.02em}
+.muted{color:var(--muted)}
+
+/* ---------- top bar ---------- */
+.bar-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:48px}
+.mark{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.mark svg{flex:none}
+.stamp{border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--muted);background:var(--surface)}
+
+/* ---------- intro ---------- */
+.friend{background:var(--accent-soft);border-radius:var(--r);padding:14px 18px;margin-bottom:28px;display:none}
+.hero h1{font-size:clamp(44px,9vw,76px);letter-spacing:-.02em;margin-bottom:20px}
+.lede{font-size:21px;max-width:34em;margin-bottom:28px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 20px;padding:0;margin:0 0 32px;list-style:none;color:var(--muted);font-size:16px}
+.facts li{display:flex;align-items:center;gap:8px}
+.facts li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:999px;padding:16px 30px;font-weight:700;font-size:18px;background:var(--accent);color:var(--on-accent);transition:transform .12s ease,box-shadow .12s ease}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(35,70,184,.25)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.ghost:hover{border-color:var(--muted);box-shadow:none}
+.save-box{margin-top:24px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:8px;max-width:560px}
+.switch{display:flex;align-items:flex-start;gap:12px;font-weight:700;cursor:pointer}
+.switch input{appearance:none;flex:none;width:44px;height:26px;border-radius:999px;background:var(--line);position:relative;margin:0;cursor:pointer;transition:background .15s}
+.switch input::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked{background:var(--accent)}
+.switch input:checked::after{transform:translateX(18px)}
+.save-box p{font-size:15px;color:var(--muted)}
+
+section.info{margin-top:72px;border-top:1px solid var(--line);padding-top:32px;display:grid;gap:18px}
+section.info h2{font-size:30px}
+.info > p{max-width:36em}
+.scale-demo{display:flex;flex-wrap:wrap;gap:6px}
+.scale-demo span{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 14px;font-size:15px}
+.dims{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.dim{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.dim b{display:block;font-size:17px}
+.dim span{font-size:15px;color:var(--muted)}
+.center{text-align:center}
+
+/* ---------- quiz ---------- */
+.qtop{display:flex;align-items:center;gap:14px;margin-bottom:40px}
+.back{flex:none;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center}
+.back:disabled{opacity:.35;cursor:default}
+.progress{flex:1;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .3s ease}
+.count{flex:none;min-width:64px;text-align:right;color:var(--muted)}
+.qhead{display:flex;gap:10px;align-items:center;margin-bottom:14px;color:var(--muted)}
+.qid{border:1px solid var(--line);border-radius:6px;padding:1px 7px;background:var(--surface)}
+.qtext{font-size:clamp(26px,4.6vw,36px);letter-spacing:-.01em;margin-bottom:12px;outline:none}
+.qnote{color:var(--muted);margin-bottom:24px;font-size:16px}
+.opts{display:grid;gap:10px;margin-top:22px}
+.opt{text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:var(--r);padding:15px 18px;min-height:58px;font-size:18px;display:flex;gap:14px;align-items:center;transition:border-color .12s ease,background .12s ease}
+.opt:hover{border-color:var(--accent)}
+.opt kbd{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:6px;min-width:24px;height:24px;display:grid;place-items:center;flex:none}
+.opt small{display:block;color:var(--muted);font-size:15px}
+.opt[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);font-weight:700}
+.opt.na{border-style:dashed}
+.hint{margin-top:20px;color:var(--muted);font-size:14px}
+
+/* ---------- results ---------- */
+.rlabel{color:var(--muted);margin-bottom:6px}
+.score{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 16px}
+.score b{font-family:var(--display);font-weight:600;font-size:clamp(84px,18vw,132px);line-height:.9;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.score span{font-size:22px}
+.level{display:inline-block;border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px;color:var(--surface)}
+.level.low{background:var(--good)} .level.mild{background:var(--accent)} .level.moderate{background:var(--warn)} .level.high{background:var(--bad)}
+.ruler{margin:28px 0 8px;position:relative;padding-top:18px}
+.ruler svg{display:block;width:100%;height:auto;overflow:visible}
+.ruler text{fill:var(--muted);font-family:var(--body);font-size:13px}
+.ruler text.n{font-family:var(--mono);font-size:11px}
+.ruler line{stroke:var(--muted);stroke-width:1}
+.ruler .needle path{fill:var(--ink)}
+.ruler .needle line{stroke:var(--ink);stroke-width:2.5}
+.status{font-size:15px;color:var(--muted);border-left:3px solid var(--line);padding-left:12px;margin-top:18px}
+.block{margin-top:52px;display:grid;gap:14px}
+.block h2{font-size:30px}
+.block .sub{color:var(--muted);font-size:16px}
+.explain{font-size:19px;display:grid;gap:12px;max-width:36em}
+.habits{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;display:grid;gap:6px}
+.habits h3{font-family:var(--body);font-size:18px}
+.habits .tag{font-weight:700}
+.recs{display:grid;gap:12px}
+.rec{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:16px 18px;display:grid;gap:4px}
+.rec h3{font-family:var(--body);font-size:18px}
+.rec .why{font-size:15px;color:var(--muted)}
+.keep{background:var(--accent-soft);border-radius:var(--r);padding:16px 18px}
+.rows{display:grid;gap:16px}
+.row-top{display:flex;justify-content:space-between;gap:12px;font-weight:700;margin-bottom:6px}
+.row-top em{font-style:normal;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:400}
+.track{height:10px;border-radius:999px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;width:0;background:var(--accent);border-radius:999px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.row small{display:block;color:var(--muted);font-size:14px;margin-top:4px}
+.row.core .track i{background:var(--ink)}
+.facts-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;display:grid;gap:8px;align-content:start}
+.fact p{font-size:16px}
+.fact cite{font-style:normal;font-size:14px;color:var(--muted)}
+.saved{font-size:15px;color:var(--muted)}
+.share{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px 20px}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+details{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:2px 18px}
+summary{cursor:pointer;font-weight:700;padding:14px 0;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono)}
+details[open] summary::after{content:"–"}
+details > *:not(summary){margin-bottom:14px;font-size:16px}
+.refgroup h3{font-family:var(--body);font-size:16px;margin:18px 0 8px}
+.refs{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.refs li{border-top:1px solid var(--line);padding-top:8px}
+.refs .who{display:block;font-size:14px;color:var(--muted)}
+.refs .note{display:block;font-size:15px;color:var(--muted);margin-top:2px}
+.again{margin-top:40px}
+footer{margin-top:64px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between}
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;font-size:15px;opacity:0;transition:all .2s ease;pointer-events:none;z-index:5}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:520px){
+  body{font-size:17px}
+  .bar-top{margin-bottom:32px}
+  .opt kbd,.hint{display:none}
+  .lede{font-size:19px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<main>
+
+<!-- ================= INTRO ================= -->
+<section id="intro" class="screen active" aria-labelledby="h1">
+  <div class="bar-top">
+    <span class="mark">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" style="fill:var(--accent)"/><path d="M7 22h18M9 22V18M13 22V13M17 22V16M21 22V10" style="stroke:var(--on-accent)" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>
+      AI reliance check
+    </span>
+    <span class="stamp mono">v2.0</span>
+  </div>
+
+  <div class="friend" id="friend" role="note"></div>
+
+  <div class="hero">
+    <h1 id="h1">Is AI doing your thinking?</h1>
+    <p class="lede">A short self-check of how you use AI and other tech: as support for your own thinking, or as a stand-in for it. For adults of any age, whether you use AI every day or hardly at all.</p>
+    <ul class="facts">
+      <li>About 4 minutes</li>
+      <li>14 to 22 questions</li>
+      <li>Built on published research</li>
+    </ul>
+    <button class="btn" id="start">Start the check</button>
+
+    <div class="save-box">
+      <label class="switch" for="saveToggle">
+        <input type="checkbox" id="saveToggle" checked>
+        <span>Add my anonymous answers to the overall results</span>
+      </label>
+      <p id="saveNote">This helps show how habits differ across ages and walks of life. We save your answers, age bracket and result, never your name, email or IP address. Answers from anyone under 18 are never saved. We also keep an anonymous daily count of how many people start and finish.</p>
+    </div>
+  </div>
+
+  <section class="info" aria-labelledby="h-measure">
+    <h2 id="h-measure">What it measures</h2>
+    <p>Research increasingly finds that how you use AI matters more than how much. Letting it think for you is linked to weaker independent thinking; using it to support your thinking, or to take over tasks you'd never learn from, isn't. This check scores five habits, and rewards good use of AI rather than avoiding it.</p>
+    <div class="dims" id="dimlist"></div>
+    <p>Every question uses the same five answers:</p>
+    <div class="scale-demo" aria-label="Answer scale"><span>Never</span><span>Rarely</span><span>Sometimes</span><span>Often</span><span>Always</span></div>
+  </section>
+
+  <section class="info" aria-labelledby="h-sci">
+    <h2 id="h-sci">How scientific is this?</h2>
+    <p>Each question is drawn from a published study, listed below. The check itself is a self-reflection tool, not a validated psychological test or a diagnosis. Much of the AI research is new, and some studies are small or correlational, so read your result as a well-informed ballpark.</p>
+    <details>
+      <summary>The research behind it</summary>
+      <div id="refsIntro"></div>
+    </details>
+    <div class="center"><button class="btn" id="start2">Start the check</button></div>
+  </section>
+
+  <footer>
+    <span>No sign-up. No tracking cookies.</span>
+    <span>© 2026 Camilla Balbis · <a href="https://www.linkedin.com/in/camillabalbis/" target="_blank" rel="noopener">LinkedIn</a></span>
+  </footer>
+</section>
+
+<!-- ================= QUIZ ================= -->
+<section id="quiz" class="screen">
+  <div class="qtop">
+    <button class="back" id="back" aria-label="Previous question">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="progress" role="progressbar" aria-label="Progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress"><i></i></div>
+    <span class="count mono" id="count"></span>
+  </div>
+  <div class="qhead mono"><span class="qid" id="qid"></span><span id="qsec"></span></div>
+  <h2 class="qtext" id="qtext" tabindex="-1"></h2>
+  <p class="qnote" id="qnote" hidden></p>
+  <div class="opts" id="opts" role="group" aria-labelledby="qtext"></div>
+  <p class="hint">Tip: press 1–6 to answer, ← to go back.</p>
+</section>
+
+<!-- ================= RESULTS ================= -->
+<section id="results" class="screen" aria-labelledby="rscore">
+  <div class="bar-top">
+    <span class="mark">
+      <svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" style="fill:var(--accent)"/><path d="M7 22h18M9 22V18M13 22V13M17 22V16M21 22V10" style="stroke:var(--on-accent)" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>
+      AI reliance check
+    </span>
+    <span class="stamp mono">v2.0</span>
+  </div>
+
+  <p class="rlabel">Your over-reliance score</p>
+  <div class="score" id="rscore"><b id="rPct">0%</b><span class="level" id="rLevel"></span></div>
+  <div class="ruler" id="ruler" aria-hidden="true"></div>
+  <p class="status">A self-check built on published research, not a validated test or a diagnosis. Read it as a ballpark, give or take 10 points.</p>
+
+  <section class="block" aria-labelledby="h-mean">
+    <h2 id="h-mean">What this means</h2>
+    <div class="explain" id="rExplain"></div>
+    <div class="habits" id="rHabits"></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-try">
+    <h2 id="h-try">Three things to try this week</h2>
+    <p class="sub">Picked from your lowest areas. Small on purpose.</p>
+    <div class="recs" id="recs"></div>
+    <div class="keep" id="keep" hidden></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-break">
+    <h2 id="h-break">Your breakdown</h2>
+    <p class="sub">Higher is better in every row. Each area is scored 0 to 100 from three questions.</p>
+    <div class="rows" id="rows"></div>
+  </section>
+
+  <section class="block" aria-labelledby="h-res">
+    <h2 id="h-res">What the research says</h2>
+    <div class="facts-grid" id="factsGrid"></div>
+  </section>
+
+  <section class="block share" aria-labelledby="h-share">
+    <h2 id="h-share">Share the check</h2>
+    <p class="sub">Your link shows your score and invites the other person to take it.</p>
+    <div class="btns">
+      <button class="btn" id="shareBtn">Share</button>
+      <button class="btn ghost" id="copyBtn">Copy link</button>
+      <button class="btn ghost" id="saveCard">Save image</button>
+    </div>
+    <p class="saved" id="savedNote"></p>
+  </section>
+
+  <section class="block" aria-labelledby="h-fine">
+    <h2 id="h-fine">The fine print</h2>
+    <details>
+      <summary>What this check is, and isn't</summary>
+      <p>This is a self-reflection tool, not a validated psychological instrument or a medical test. Its questions and scoring are built from published research, but the check itself hasn't been validated. Most of the AI research is recent, many studies are correlational, and some are small or not yet peer reviewed.</p>
+      <p>Health and neurological differences can affect focus, memory and navigation in ways this check can't tell apart from habits. If you're worried about your memory or thinking, talk to a doctor; that's a different conversation from this check.</p>
+    </details>
+    <details>
+      <summary>How scoring works</summary>
+      <p>Each answer scores 0 to 4. For some questions "Always" is the strong answer, for others "Never" is, so there's no pattern to coast on. Each area's score is the average of its questions, scaled to 0–100. Your over-reliance score is 100 minus the average of the five areas, each weighted equally. If you rarely use AI, it's based on the seven questions everyone answers instead.</p>
+      <p>"Doesn't apply" answers are left out rather than counted against you. Levels: Low under 25, Mild 25–44, Moderate 45–64, High 65 and over. The brain-health habits questions are reported separately and never change your score.</p>
+    </details>
+    <details>
+      <summary>What gets saved</summary>
+      <p id="fineSave">If the switch on the first screen was on and you're 18 or over, we save your answers, age bracket, what fills your week, how often you use AI, your scores, the date and how long the check took. We never save your name, email, IP address or device details. We also keep an anonymous count of how many checks are started and finished each day.</p>
+    </details>
+    <details>
+      <summary>The research behind it</summary>
+      <div id="refsResults"></div>
+    </details>
+  </section>
+
+  <button class="btn ghost again" id="again">Take it again</button>
+
+  <footer>
+    <span>AI reliance check · v2.0</span>
+    <span>© 2026 Camilla Balbis · <a href="https://www.linkedin.com/in/camillabalbis/" target="_blank" rel="noopener">LinkedIn</a></span>
+  </footer>
+</section>
+
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/*LOGIC-START*/
+const VERSION = "v2.0";
+
+const DIMS = {
+  think:  {name:"Thinking first",      blurb:"Trying it yourself before you hand it off"},
+  check:  {name:"Checking",            blurb:"Verifying what AI or your feed tells you"},
+  memory: {name:"Memory & wayfinding", blurb:"Recall and sense of direction you still use"},
+  smart:  {name:"Smart use",           blurb:"Handing off drudgery, using AI to learn"},
+  aware:  {name:"Self-awareness",      blurb:"Knowing what you've handed over"}
+};
+
+const SCALE = ["Never","Rarely","Sometimes","Often","Always"];
+
+const SETUP = {
+  age: {q:"First, how old are you?", note:"We ask so results can be compared across age groups. It doesn't change your questions.",
+    o:[["under-18","Under 18"],["18-24","18–24"],["25-34","25–34"],["35-44","35–44"],["45-54","45–54"],["55-64","55–64"],["65+","65 or over"]]},
+  context: {q:"What fills most of your week?", note:"A few questions use examples from your week.",
+    o:[["study","Studying"],["work","Working"],["both","Both studying and working"],["everyday","Neither right now","At home, caring for family, retired or between things"]]},
+  ai_use: {q:"How often do you use AI tools such as ChatGPT, Claude, Gemini or Copilot?", note:"If you rarely use AI, you'll skip the AI-specific questions.",
+    o:[["daily","Every day or almost"],["weekly","A few times a week"],["monthly","A few times a month"],["rarely","Rarely"],["never","Never"]]}
+};
+const AI_USERS = ["daily","weekly","monthly"];
+
+// key: +1 = "Always" is the strong answer, -1 = "Never" is. ai: shown only to people who use AI monthly or more.
+// x: words that change with what fills your week. na: a "doesn't apply" option, left out of scoring.
+const ITEMS = [
+  {id:"T1", dim:"think",  key: 1, ai:false, q:"When you get stuck on something {x}, how often do you have a go at it yourself before asking AI or searching?",
+    x:{study:"in your coursework", work:"at work", both:"in your studies or at work", everyday:"in day-to-day life"}},
+  {id:"M1", dim:"memory", key:-1, ai:false, q:"When you go somewhere you've been at least three times before, how often do you follow turn-by-turn directions?", na:"Doesn't apply to me"},
+  {id:"C3", dim:"check",  key: 1, ai:false, q:"When you see a post or clip that confirms what you already believe, how often do you check it's real before sharing or repeating it?"},
+  {id:"S1", dim:"smart",  key:-1, ai:false, q:"For tedious tasks that teach you nothing ({x}), how often do you do every step by hand when a tool could do it for you?",
+    x:{study:"formatting references, filling in forms", work:"reformatting documents, routine admin emails", both:"formatting references, routine admin emails", everyday:"filling in forms, comparing bills"}},
+  {id:"M2", dim:"memory", key: 1, ai:false, q:"A few days after learning something interesting, how often could you explain the gist to someone without looking it up?"},
+  {id:"A3", dim:"aware",  key: 1, ai:false, q:"How often do you do something the hard way on purpose, to keep a skill? For example mental maths, writing a first draft, or finding your way without a map."},
+  {id:"M3", dim:"memory", key: 1, ai:false, q:"When you need something you once knew (a name, a number, how to do a task), how often do you try to recall it before looking it up?"},
+  {id:"T2", dim:"think",  key:-1, ai:true,  q:"When you need to write {x}, how often does AI write the first draft?",
+    x:{study:"an essay or assignment", work:"a work email or report", both:"an assignment or a work document", everyday:"a message or letter that matters"}},
+  {id:"C1", dim:"check",  key: 1, ai:true,  q:"When AI gives you a fact, number or claim you're going to use, how often do you check it against another source?", na:"I don't use AI for facts"},
+  {id:"S2", dim:"smart",  key: 1, ai:true,  q:"When you use AI to learn {x}, how often do you ask it to explain, quiz you or give hints, rather than just give you the answer?",
+    x:{study:"something for a class", work:"a new tool or process at work", both:"something for a class or for work", everyday:"a new skill or hobby"}, na:"I don't use AI for learning"},
+  {id:"A1", dim:"aware",  key: 1, ai:true,  q:"After AI helps you with something, how often could you do it again without it?"},
+  {id:"T3", dim:"think",  key:-1, ai:true,  q:"When you face a decision that matters to you, how often do you ask AI what to do before you've formed your own view?"},
+  {id:"C2", dim:"check",  key:-1, ai:true,  q:"When AI summarises something important for you (an email thread, a document, an article), how often do you act on the summary without opening the original?", na:"I don't use AI summaries"},
+  {id:"S3", dim:"smart",  key: 1, ai:true,  q:"When you hand a task to AI, how often do you give it your own ideas, notes or draft to work from?"},
+  {id:"A2", dim:"aware",  key:-1, ai:true,  q:"When AI isn't available (offline, down, or not allowed), how often do you feel stuck on things you'd normally use it for?"}
+];
+
+// Brain-health habits: reported as a note, never part of the over-reliance score. Option value = score 0-4, null = not scored.
+const HABITS = [
+  {id:"P1", q:"In the past year, have you been learning something new and demanding, such as an instrument, a language, a sport or a craft?",
+    o:[["Yes, I'm learning something now",4],["Earlier this year, but not now",2],["Not this year",0]]},
+  {id:"P2", q:"How often do you spend 30 minutes or more focused on one thing with your phone out of reach, such as reading, a film or a hobby?",
+    o:[["Most days",4],["Most weeks",8/3],["Now and then",4/3],["Rarely",0]]},
+  {id:"P3", q:"In a typical week, on how many days do you do something that raises your heart rate? A brisk walk counts.",
+    o:[["5 or more days",4],["3–4 days",8/3],["1–2 days",4/3],["None",0],["My health limits this right now",null]]},
+  {id:"P4", q:"In a typical week, on how many days do you have a real-time conversation with someone, in person or on a call?",
+    o:[["6–7 days",4],["4–5 days",8/3],["2–3 days",4/3],["0–1 days",0]]}
+];
+
+function isAiUser(setup){ return AI_USERS.includes(setup.ai_use); }
+
+function buildSteps(setup){
+  const steps = ["age","context","ai_use"].map(id => ({kind:"setup", id}));
+  if(!setup.ai_use) return steps;
+  const ai = isAiUser(setup);
+  ITEMS.filter(it => ai || !it.ai).forEach(it => steps.push({kind:"item", id:it.id}));
+  HABITS.forEach(h => steps.push({kind:"habit", id:h.id}));
+  return steps;
+}
+
+function itemText(it, context){ return it.x ? it.q.replace("{x}", it.x[context] || it.x.everyday) : it.q; }
+
+// answer = index into SCALE (0 Never .. 4 Always) or "na"
+function itemScore(it, a){
+  if(a == null || a === "na") return null;
+  return it.key > 0 ? a : 4 - a;
+}
+
+function scoreHabits(ans){
+  const vals = [];
+  HABITS.forEach(h => { const a = ans[h.id]; if(a == null) return; const v = h.o[a] && h.o[a][1]; if(v == null) return; vals.push(v); });
+  if(!vals.length) return {score:null, level:null};
+  const s = Math.round(vals.reduce((x,y) => x+y, 0) / vals.length / 4 * 100);
+  return {score:s, level: s >= 70 ? "strong" : s >= 40 ? "mixed" : "low"};
+}
+
+function pickPattern(d, score, ai){
+  if(!ai) return "light";
+  const lt = (v,x) => v != null && v < x, ge = (v,x) => v != null && v >= x;
+  const vals = Object.values(d).filter(v => v != null);
+  if(vals.length >= 3){
+    const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+    if(avg >= 70 && Math.min(...vals) >= 55) return "balanced";
+  }
+  if(lt(d.think,40) && (lt(d.check,50) || lt(d.aware,45))) return "outsourcing";
+  if(lt(d.check,40)) return "unchecked";
+  if(lt(d.smart,45) && ge(d.think,60) && ge(d.aware,55)) return "manual";
+  if(lt(d.aware,55) || score >= 45) return "drifting";
+  return "steady";
+}
+
+function scoreAll(ans, setup){
+  const ai = isAiUser(setup);
+  const sum = {}, n = {};
+  Object.keys(DIMS).forEach(k => { sum[k] = 0; n[k] = 0; });
+  let cs = 0, cn = 0;
+  ITEMS.forEach(it => {
+    if(it.ai && !ai) return;
+    const v = itemScore(it, ans[it.id]); if(v == null) return;
+    sum[it.dim] += v; n[it.dim]++;
+    if(!it.ai){ cs += v; cn++; }
+  });
+  const dims = {}, recDims = {};
+  Object.keys(DIMS).forEach(k => {
+    const m = n[k] ? Math.round(sum[k] / n[k] * 25) : null;
+    recDims[k] = m;                 // for suggestions: one answer is enough
+    dims[k] = n[k] >= 2 ? m : null; // for display and the score: two or more
+  });
+  const core = cn ? Math.round(cs / cn * 25) : null;
+  const shown = Object.values(dims).filter(v => v != null);
+  let base = (ai && shown.length) ? shown.reduce((a,b) => a+b, 0) / shown.length : core;
+  if(base == null) base = 50;
+  const score = Math.max(2, Math.min(98, Math.round(100 - base)));
+  const level = score < 25 ? "low" : score < 45 ? "mild" : score < 65 ? "moderate" : "high";
+  return {ai, dims, recDims, core, score, level, pattern: pickPattern(dims, score, ai), habits: scoreHabits(ans)};
+}
+
+const RECS = {
+  think: [
+    {t:"Try first, then look it up", a:"Before you ask AI or search, give yourself two minutes to come up with your own answer or plan. Then compare.", w:"Writing first and using AI after kept people more engaged than starting with AI (Kosmyna et al., 2025, preprint)."},
+    {t:"Ask for hints, not answers", ai:true, a:"Add \"give me a hint, not the answer\" to your next prompt on something you want to learn.", w:"A hint-only AI tutor largely avoided the learning loss seen with unrestricted ChatGPT (Bastani et al., 2025)."}
+  ],
+  check: [
+    {t:"The two-source rule", a:"If it matters, check one independent source before you act on it or pass it on.", w:"The more people trust AI, the less they check what it tells them (Lee et al., 2025)."},
+    {t:"Ask what might be wrong", ai:true, a:"Once this week, ask AI \"what might be wrong with this?\" about an answer you relied on.", w:"Looking for errors keeps you the editor rather than the audience."}
+  ],
+  memory: [
+    {t:"Directions there, memory back", a:"Use directions on the way somewhere new. Find your way back without them.", w:"Heavy GPS use is linked to faster decline in spatial memory (Dahmani & Bohbot, 2020)."},
+    {t:"Explain one thing from memory", a:"Tell someone about one thing you learned today, without looking anything up.", w:"Pulling information back out of memory beats re-reading it (Roediger & Karpicke, 2006)."}
+  ],
+  smart: [
+    {t:"Hand off one tedious task", a:"Let a tool do the first pass on a chore: formatting, a comparison, a standard email. Then check it.", w:"Effort that's pure friction costs time without building skill (Sweller, 1988)."},
+    {t:"Use AI as a tutor", ai:true, a:"When you're learning, ask it to quiz you or explain why, and do the practice yourself.", w:"People who asked AI conceptual questions kept more of what they learned (Anthropic, 2026)."}
+  ],
+  aware: [
+    {t:"Decide before you delegate", a:"Before handing something off, ask: do I want to learn this, or just get it done? If learn, give it ten minutes first.", w:"Effort you choose on purpose is what makes learning stick."},
+    {t:"Redo it without help", ai:true, a:"After AI helps with something you'd like to be able to do, close it and try once on your own.", w:"AI users tend to overestimate how well they did (Fernandes et al., 2026)."}
+  ],
+  habits: [
+    {t:"Start one hard, new thing", a:"Twenty minutes, three times this week, on something you're not yet good at.", w:"Learning demanding new skills improved memory in older adults (Park et al., 2014)."},
+    {t:"Walk and talk", a:"Turn one call into a walk, or one text thread into a coffee.", w:"Physical inactivity and social isolation are both modifiable dementia risk factors (Livingston et al., 2024)."}
+  ]
+};
+
+const KEEP = {
+  think:"You think before you hand things off. That's the habit most of this research protects.",
+  check:"You check what you're told before you use it. Keep being the editor.",
+  memory:"You still exercise your own memory and sense of direction.",
+  smart:"You hand off the right things and keep the ones that teach you something.",
+  aware:"You notice what you're handing over, which keeps the rest from sliding."
+};
+
+function pickRecs(r){
+  const order = Object.keys(r.recDims).filter(k => r.recDims[k] != null).sort((a,b) => r.recDims[a] - r.recDims[b]);
+  const ok = rec => r.ai || !rec.ai;
+  const cand = [];
+  if(order.length){
+    cand.push(RECS[order[0]][0]);
+    const gap = order.length > 1 ? r.recDims[order[1]] - r.recDims[order[0]] : 0;
+    if(gap >= 25 && ok(RECS[order[0]][1])) cand.push(RECS[order[0]][1]);
+    order.slice(1).forEach(k => cand.push(RECS[k][0]));
+  }
+  let out = cand.slice(0,3);
+  if(r.habits.level === "low"){ if(out.length >= 3) out[2] = RECS.habits[0]; else out.push(RECS.habits[0]); }
+  RECS.habits.forEach(h => { if(out.length < 3 && !out.includes(h)) out.push(h); });
+  return out.slice(0,3);
+}
+
+const LEVELS = {
+  low:      {name:"Low",      text:"You mostly use AI and other tech as support for your own thinking, not as a stand-in for it."},
+  mild:     {name:"Mild",     text:"Mostly healthy habits, with a few places where tools do more of the thinking than you might choose."},
+  moderate: {name:"Moderate", text:"A noticeable share of your everyday thinking has moved over to tools, in ways that can wear down skills over time."},
+  high:     {name:"High",     text:"Much of your everyday thinking is being handed to tools rather than supported by them."}
+};
+
+const PATTERNS = {
+  balanced:"Your pattern: you think first, check what you're given, and hand off the tasks that don't teach you anything. Recent research associates exactly this with AI supporting thinking rather than replacing it (Zhu et al., 2026).",
+  outsourcing:"Your pattern: AI often does the first round of thinking for you, drafting, deciding or coming up with ideas before you've formed your own view. In studies, this kind of dependent use is the one most linked to weaker independent thinking (Gerlich, 2025; Zhu et al., 2026). You don't need to use AI less, just later: form your own view first.",
+  unchecked:"Your pattern: you do plenty of your own thinking, but what AI gives you tends to be used as it comes. Sounding confident isn't the same as being right, and people who trust AI more tend to check it less (Lee et al., 2025).",
+  manual:"Your pattern: your thinking habits are strong, but you do a lot of tedious work by hand that a tool could take off you. That effort costs time without building skill. Handing off the drudgery leaves more room for the thinking you're good at.",
+  drifting:"Your pattern: no single habit stands out, but some tasks seem to have moved to autopilot without a deliberate decision. That's how over-reliance usually happens: small handoffs that stop being noticed. The question that helps most is \"do I want to learn this, or just get it done?\"",
+  steady:"Your pattern: mostly solid habits, with one or two softer areas. Your lowest areas below are the easiest places to start.",
+  light:"You rarely use AI, so the AI-specific questions were skipped. Your score comes from the seven questions everyone answers, which cover everyday offloading to search, maps and other tools."
+};
+
+const HABIT_NOTES = {
+  strong:"These habits don't change your score, but they're the ones research links to how well thinking holds up over the years: learning new things, focus, movement and time with people. Yours are in good shape.",
+  mixed:"These habits don't change your score, but research links learning new things, focus, movement and time with people to how well thinking holds up over the years. Some of yours are there; one or two could use attention.",
+  low:"These habits don't change your score, but research links learning new things, focus, movement and time with people to how well thinking holds up over the years. They're also among the easiest things on this page to change."
+};
+/*LOGIC-END*/
+
+// ================= REFERENCES =================
+const REFS = [
+  {g:"AI and how we think", items:[
+    {who:"Gerlich (2025). Societies", t:"AI tools in society: Impacts on cognitive offloading and the future of critical thinking", u:"https://doi.org/10.3390/soc15010006",
+      n:"666 participants. Heavier AI use went with lower critical-thinking scores, largely explained by cognitive offloading. Correlational."},
+    {who:"Lee et al. (2025). CHI '25", t:"The impact of generative AI on critical thinking: Self-reported reductions in cognitive effort and confidence effects", u:"https://doi.org/10.1145/3706598.3713778",
+      n:"319 knowledge workers. More confidence in AI went with less critical thinking; more self-confidence went with more."},
+    {who:"Zhu et al. (2026). Frontiers in Psychology", t:"Not all cognitive offloading is equal: Distinguishing dependent and autonomous offloading to generative AI", u:"https://doi.org/10.3389/fpsyg.2026.1878629",
+      n:"Letting AI do the thinking and using it as a scaffold had different correlates. The basis for rewarding good AI use."},
+    {who:"Bastani et al. (2025). PNAS", t:"Generative AI without guardrails can harm learning: Evidence from high school mathematics", u:"https://doi.org/10.1073/pnas.2422633122",
+      n:"Nearly 1,000 students. Unrestricted ChatGPT helped practice but hurt later unaided performance; a hint-giving tutor largely avoided this."},
+    {who:"Anthropic (2026)", t:"How AI assistance impacts the formation of coding skills", u:"https://www.anthropic.com/research/AI-assistance-coding-skills",
+      n:"Randomized trial. Developers learning a new library with AI scored lower on a follow-up quiz; those asking conceptual questions kept more. Small and short-term."},
+    {who:"Fernandes et al. (2026). Computers in Human Behavior", t:"AI makes you smarter but none the wiser: The disconnect between performance and metacognition", u:"https://doi.org/10.1016/j.chb.2025.108779",
+      n:"AI users did better on reasoning tasks but overestimated how well they did."},
+    {who:"Kosmyna et al. (2025). arXiv preprint", t:"Your brain on ChatGPT: Accumulation of cognitive debt when using an AI assistant for essay writing", u:"https://arxiv.org/abs/2506.08872",
+      n:"EEG study, 54 participants, not yet peer reviewed. Writing unaided first, then using AI, looked better than starting with AI."}
+  ]},
+  {g:"Memory and offloading", items:[
+    {who:"Dahmani & Bohbot (2020). Scientific Reports", t:"Habitual use of GPS negatively impacts spatial memory during self-guided navigation", u:"https://doi.org/10.1038/s41598-020-62877-0",
+      n:"More GPS use went with worse spatial memory, and with steeper decline over three years. Small longitudinal sample."},
+    {who:"Roediger & Karpicke (2006). Psychological Science", t:"Test-enhanced learning: Taking memory tests improves long-term retention", u:"https://doi.org/10.1111/j.1467-9280.2006.01693.x",
+      n:"Pulling information back out of memory beats re-reading it. The basis for the recall questions."},
+    {who:"Storm & Stone (2015). Psychological Science", t:"Saving-enhanced memory: The benefits of saving on the learning and remembering of new information", u:"https://doi.org/10.1177/0956797614559285",
+      n:"Saving information outside your head freed memory for new information. Why calendars and reminders aren't scored against you."},
+    {who:"Risko & Gilbert (2016). Trends in Cognitive Sciences", t:"Cognitive offloading", u:"https://doi.org/10.1016/j.tics.2016.07.002",
+      n:"Review of when offloading helps and when it costs."},
+    {who:"Sweller (1988). Cognitive Science", t:"Cognitive load during problem solving: Effects on learning", u:"https://doi.org/10.1207/s15516709cog1202_4",
+      n:"Separates effort that builds skill from effort that's just friction."}
+  ]},
+  {g:"Long-term brain health", items:[
+    {who:"Livingston et al. (2024). The Lancet", t:"Dementia prevention, intervention, and care: 2024 report of the Lancet standing Commission", u:"https://doi.org/10.1016/S0140-6736(24)01296-0",
+      n:"14 modifiable risk factors, including physical inactivity and social isolation."},
+    {who:"Park et al. (2014). Psychological Science", t:"The impact of sustained engagement on cognitive function in older adults: The Synapse Project", u:"https://doi.org/10.1177/0956797613499592",
+      n:"Learning demanding new skills improved memory more than easy or purely social activities."}
+  ]},
+  {g:"Background and similar tools", items:[
+    {who:"Hendrycks, Mazeika & Woodside (2023). arXiv", t:"An overview of catastrophic AI risks", u:"https://arxiv.org/abs/2306.12001",
+      n:"Discusses enfeeblement: people gradually losing abilities by handing them over to machines."},
+    {who:"Ul Alam (2026). arXiv", t:"PAUSE: A privacy-preserving self-reflection tool for AI-associated cognitive offloading", u:"https://arxiv.org/abs/2609.13155",
+      n:"A longer, research-style self-check on AI and offloading. A good next step after this one."}
+  ]}
+];
+
+const FACTS = [
+  {p:"Letting AI do your thinking and using it to support your thinking had different outcomes. Only the first was linked to the downsides.", c:"Zhu et al., Frontiers in Psychology, 2026"},
+  {p:"Among 319 knowledge workers, those who trusted AI more reported doing less critical thinking. Those confident in their own skills did more.", c:"Lee et al., CHI 2025"},
+  {p:"Students given unrestricted ChatGPT did better in practice but worse later on their own. A version that only gave hints largely avoided the drop.", c:"Bastani et al., PNAS, 2025"},
+  {p:"Older adults who spent three months learning demanding new skills improved their memory more than those doing easy or purely social activities.", c:"Park et al., Psychological Science, 2014"}
+];
+
+// ================= STATE =================
+const $ = id => document.getElementById(id);
+const inFrame = (() => { try { return window.self !== window.top; } catch(e) { return true; } })();
+const esc = t => String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+let S = {screen:"intro", setup:{}, ans:{}, step:0, save:true, t0:0, secs:null};
+let steps = buildSteps(S.setup), R = null, locked = false;
+
+function show(name){
+  S.screen = name;
+  ["intro","quiz","results"].forEach(s => $(s).classList.toggle("active", s === name));
+  window.scrollTo(0,0);
+}
+
+function renderRefs(el){
+  el.innerHTML = REFS.map(g => `<div class="refgroup"><h3>${esc(g.g)}</h3><ul class="refs">${
+    g.items.map(r => `<li><a href="${esc(r.u)}" target="_blank" rel="noopener">${esc(r.t)}</a><span class="who">${esc(r.who)}</span><span class="note">${esc(r.n)}</span></li>`).join("")
+  }</ul></div>`).join("");
+}
+renderRefs($("refsIntro")); renderRefs($("refsResults"));
+$("dimlist").innerHTML = Object.values(DIMS).map(d => `<div class="dim"><b>${esc(d.name)}</b><span>${esc(d.blurb)}</span></div>`).join("");
+
+// shared-link banner and channel tag
+const params = (() => { try { return new URLSearchParams(location.search); } catch(e) { return new URLSearchParams(); } })();
+const SRC = (params.get("src") || "").slice(0,32) || null;
+(function(){
+  const s = parseInt(params.get("s"),10), l = params.get("l");
+  if(!isNaN(s) && LEVELS[l]){
+    $("friend").textContent = `Someone shared their result with you: ${Math.max(0,Math.min(100,s))}% over-reliance (${LEVELS[l].name}). See where you land.`;
+    $("friend").style.display = "block";
+  }
+})();
+
+$("saveToggle").onchange = e => { S.save = e.target.checked; };
+
+function post(path, body){
+  if(inFrame) return Promise.resolve(false); // preview inside claude.ai: there is no database here
+  return fetch(path, {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(body), keepalive:true})
+    .then(r => r.ok).catch(() => false);
+}
+
+function start(){
+  S.setup = {}; S.ans = {}; S.step = 0; S.secs = null; S.t0 = Date.now();
+  steps = buildSteps(S.setup);
+  post("/api/tally", {version:VERSION, event:"start"});
+  show("quiz"); renderStep();
+}
+$("start").onclick = start; $("start2").onclick = start;
+
+// ================= QUESTIONS =================
+const SEC = {setup:"About you", everyday:"Everyday habits", ai:"How you use AI", habit:"Brain-health habits"};
+
+function currentView(){
+  const st = steps[S.step];
+  if(st.kind === "setup"){
+    const d = SETUP[st.id];
+    return {id:null, sec:SEC.setup, q:d.q, note:d.note, opts:d.o.map((o,i) => ({label:o[1], sub:o[2], val:o[0]})), cur:S.setup[st.id]};
+  }
+  if(st.kind === "item"){
+    const it = ITEMS.find(i => i.id === st.id);
+    const opts = SCALE.map((s,i) => ({label:s, val:i}));
+    if(it.na) opts.push({label:it.na, val:"na", na:true});
+    return {id:it.id, sec: it.ai ? SEC.ai : SEC.everyday, q:itemText(it, S.setup.context), opts, cur:S.ans[it.id]};
+  }
+  const h = HABITS.find(x => x.id === st.id);
+  return {id:h.id, sec:SEC.habit, q:h.q, note: st.id === "P1" ? "These four don't change your score. They add context to it." : null,
+    opts:h.o.map((o,i) => ({label:o[0], val:i, na:o[1] === null})), cur:S.ans[h.id]};
+}
+
+function totalEstimate(){ return S.setup.ai_use ? steps.length : 22; }
+
+function renderStep(){
+  locked = false;
+  const v = currentView(), total = totalEstimate();
+  $("qid").textContent = v.id || "··";
+  $("qsec").textContent = v.sec;
+  $("qtext").textContent = v.q;
+  $("qnote").hidden = !v.note; $("qnote").textContent = v.note || "";
+  $("count").textContent = `${S.step+1} / ${total}`;
+  const pct = Math.round(S.step / total * 100);
+  $("progress").firstElementChild.style.width = pct + "%";
+  $("progress").setAttribute("aria-valuenow", pct);
+  $("back").disabled = S.step === 0;
+  $("opts").innerHTML = v.opts.map((o,i) =>
+    `<button class="opt${o.na ? " na" : ""}" data-i="${i}" aria-pressed="${v.cur === o.val}"><kbd>${i+1}</kbd><span>${esc(o.label)}${o.sub ? `<small>${esc(o.sub)}</small>` : ""}</span></button>`).join("");
+  $("opts").querySelectorAll(".opt").forEach(b => b.onclick = () => choose(+b.dataset.i));
+  $("qtext").focus({preventScroll:true});
+}
+
+function choose(i){
+  if(locked) return;
+  const v = currentView(), o = v.opts[i]; if(!o) return;
+  locked = true;
+  const st = steps[S.step];
+  if(st.kind === "setup"){
+    S.setup[st.id] = o.val;
+    if(st.id === "ai_use"){
+      steps = buildSteps(S.setup);
+      // drop answers to questions no longer in the flow (if someone changed their AI-use answer)
+      const keep = new Set(steps.map(s => s.id));
+      Object.keys(S.ans).forEach(k => { if(!keep.has(k)) delete S.ans[k]; });
+    }
+  } else {
+    S.ans[st.id] = o.val;
+  }
+  $("opts").querySelectorAll(".opt").forEach(b => b.setAttribute("aria-pressed", +b.dataset.i === i));
+  setTimeout(next, 220);
+}
+
+function next(){
+  if(S.step < steps.length - 1){ S.step++; renderStep(); }
+  else finish();
+}
+function back(){ if(S.step > 0){ S.step--; renderStep(); } }
+$("back").onclick = back;
+
+document.addEventListener("keydown", e => {
+  if(!$("quiz").classList.contains("active") || e.metaKey || e.ctrlKey || e.altKey) return;
+  const n = parseInt(e.key, 10);
+  if(n >= 1 && n <= 9){ e.preventDefault(); choose(n-1); }
+  if(e.key === "ArrowLeft"){ e.preventDefault(); back(); }
+});
+
+// ================= RESULTS =================
+function finish(){
+  S.secs = Math.round((Date.now() - S.t0) / 1000);
+  post("/api/tally", {version:VERSION, event:"finish"});
+  R = scoreAll(S.ans, S.setup);
+  renderResult();
+  submit();
+}
+
+function submit(){
+  const note = $("savedNote");
+  if(S.setup.age === "under-18"){ note.textContent = "Your answers weren't saved, because you're under 18."; return; }
+  if(!S.save){ note.textContent = "You chose not to add your answers to the overall results."; return; }
+  if(inFrame){ note.textContent = "This is a preview, so nothing was saved. Saving works on the live site."; return; }
+  const answers = {};
+  steps.forEach(st => { if(st.kind !== "setup" && S.ans[st.id] != null) answers[st.id] = S.ans[st.id]; });
+  const body = {
+    version:VERSION, context:S.setup.context, age_bracket:S.setup.age, ai_use:S.setup.ai_use,
+    answers, dims:R.dims, core:R.core, score:R.score, pattern:R.pattern, habits:R.habits.level,
+    seconds:S.secs, src:SRC
+  };
+  note.textContent = "Adding your anonymous answers to the overall results…";
+  post("/api/submit", body).then(ok => {
+    note.textContent = ok ? "Your anonymous answers were added to the overall results. Thank you."
+                          : "We couldn't save your answers this time. Your result isn't affected.";
+  });
+}
+
+function drawRuler(score){
+  const W = 680, x = v => 10 + v / 100 * (W - 20);
+  const bands = [[0,25,"var(--good)","Low"],[25,45,"var(--accent)","Mild"],[45,65,"var(--warn)","Moderate"],[65,100,"var(--bad)","High"]];
+  let s = `<svg viewBox="0 0 ${W} 74" role="img" aria-label="Score ${score} on a scale of 0 to 100">`;
+  bands.forEach(([a,b,c,l]) => {
+    s += `<rect x="${x(a)}" y="22" width="${x(b)-x(a)}" height="12" style="fill:${c}" opacity=".85"/>`;
+    s += `<text x="${(x(a)+x(b))/2}" y="60" text-anchor="middle">${l}</text>`;
+  });
+  for(let v = 0; v <= 100; v += 5){
+    const big = v % 25 === 0 || v === 45 || v === 65;
+    s += `<line x1="${x(v)}" x2="${x(v)}" y1="34" y2="${big ? 44 : 39}"/>`;
+  }
+  [0,25,45,65,100].forEach(v => s += `<text x="${x(v)}" y="16" text-anchor="middle" class="n">${v}</text>`);
+  s += `<g id="needle" class="needle" style="transition:transform 1s cubic-bezier(.2,.8,.2,1);transform:translateX(${x(0)}px)"><path d="M0 20 L-7 8 L7 8 Z"/><line x1="0" x2="0" y1="20" y2="36"/></g>`;
+  s += `</svg>`;
+  $("ruler").innerHTML = s;
+  requestAnimationFrame(() => requestAnimationFrame(() => { const n = document.getElementById("needle"); if(n) n.style.transform = `translateX(${x(score)}px)`; }));
+}
+
+function renderResult(){
+  const L = LEVELS[R.level];
+  $("rPct").textContent = R.score + "%";
+  $("rLevel").textContent = L.name;
+  $("rLevel").className = "level " + R.level;
+  drawRuler(R.score);
+
+  $("rExplain").innerHTML = `<p>${esc(L.text)}</p><p>${esc(PATTERNS[R.pattern])}</p>`;
+
+  const H = R.habits;
+  if(H.level){
+    const name = {strong:"Strong", mixed:"Mixed", low:"Low"}[H.level];
+    $("rHabits").innerHTML = `<h3>Brain-health habits: <span class="tag">${name}</span></h3><p>${esc(HABIT_NOTES[H.level])}</p>`;
+    $("rHabits").hidden = false;
+  } else $("rHabits").hidden = true;
+
+  $("recs").innerHTML = pickRecs(R).map(r => `<div class="rec"><h3>${esc(r.t)}</h3><p>${esc(r.a)}</p><p class="why">${esc(r.w)}</p></div>`).join("");
+  const shownDims = Object.keys(R.dims).filter(k => R.dims[k] != null).sort((a,b) => R.dims[b] - R.dims[a]);
+  if(shownDims.length && R.dims[shownDims[0]] >= 70){ $("keep").hidden = false; $("keep").innerHTML = `<strong>Keep doing this.</strong> ${esc(KEEP[shownDims[0]])}`; }
+  else $("keep").hidden = true;
+
+  const row = (name, v, small, cls) => `<div class="row${cls ? " " + cls : ""}"><div class="row-top"><span>${esc(name)}</span><em>${v == null ? "not enough answers" : v}</em></div><div class="track"><i data-w="${v || 0}"></i></div><small>${esc(small)}</small></div>`;
+  let rows = Object.keys(DIMS).map(k => row(DIMS[k].name, R.dims[k], R.dims[k] == null && !R.ai ? DIMS[k].blurb + " · AI questions skipped" : DIMS[k].blurb)).join("");
+  rows += row("Everyday thinking habits", R.core, "The seven questions everyone answers, whatever their AI use. The fairest number to compare across people.", "core");
+  $("rows").innerHTML = rows;
+
+  $("factsGrid").innerHTML = FACTS.map(f => `<div class="fact"><p>${esc(f.p)}</p><cite>${esc(f.c)}</cite></div>`).join("");
+
+  show("results");
+  requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll(".track i").forEach(i => i.style.width = i.dataset.w + "%")));
+  prepareCard();
+}
+
+$("again").onclick = () => { S = {screen:"intro", setup:{}, ans:{}, step:0, save:$("saveToggle").checked, t0:0, secs:null}; R = null; show("intro"); };
+
+// ================= SHARING =================
+if(inFrame) $("saveCard").hidden = true;
+
+function shareURL(){
+  const base = (location.origin && location.origin !== "null") ? location.origin + location.pathname : location.href.split("?")[0];
+  return `${base}?s=${R.score}&l=${R.level}&src=share`;
+}
+function shareText(){ return `My AI over-reliance score: ${R.score}% (${LEVELS[R.level].name}). Is AI doing your thinking? Take the 4-minute check:`; }
+function toast(m){ const t = $("toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); }
+async function copy(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch(_){} ta.remove(); return ok;
+  }
+}
+$("copyBtn").onclick = async () => toast(await copy(shareURL()) ? "Link copied" : "Couldn't copy. Copy the address bar instead.");
+$("shareBtn").onclick = async () => {
+  const text = shareText(), url = shareURL();
+  if(cardBlob && navigator.canShare){
+    const file = new File([cardBlob], "ai-reliance-check.png", {type:"image/png"});
+    if(navigator.canShare({files:[file]})){ try { await navigator.share({files:[file], text:`${text} ${url}`}); return; } catch(e){ if(e && e.name === "AbortError") return; } }
+  }
+  if(navigator.share){ try { await navigator.share({title:"Is AI doing your thinking?", text, url}); return; } catch(e){ if(e && e.name === "AbortError") return; } }
+  toast(await copy(`${text} ${url}`) ? "Copied. Paste it anywhere." : "Couldn't share from this browser. Try Copy link.");
+};
+
+let cardBlob = null, cardPromise = null;
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+async function drawCard(){
+  try { await document.fonts.ready; } catch(e){}
+  const W = 1080, H = 1350, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d");
+  const bg = "#EDF0F2", ink = "#13202A", muted = "#55636E", accent = "#2346B8";
+  const levelCol = {low:"#2E7D5B", mild:"#2346B8", moderate:"#A86A12", high:"#B23A3A"};
+  x.fillStyle = bg; x.fillRect(0,0,W,H);
+  x.strokeStyle = "rgba(35,70,184,.07)"; x.lineWidth = 1;
+  for(let i = 0; i <= W; i += 36){ x.beginPath(); x.moveTo(i,0); x.lineTo(i,H); x.stroke(); }
+  for(let j = 0; j <= H; j += 36){ x.beginPath(); x.moveTo(0,j); x.lineTo(W,j); x.stroke(); }
+  x.fillStyle = ink; x.font = '700 34px "Atkinson Hyperlegible", sans-serif'; x.fillText("AI reliance check", 90, 130);
+  x.fillStyle = muted; x.font = '500 26px "IBM Plex Mono", monospace'; x.fillText("v2.0", W - 170, 130);
+  x.fillStyle = ink; x.font = '600 84px "Newsreader", Georgia, serif';
+  x.fillText("Is AI doing", 90, 330); x.fillText("my thinking?", 90, 425);
+  x.fillStyle = muted; x.font = '400 36px "Atkinson Hyperlegible", sans-serif'; x.fillText("My over-reliance score", 90, 590);
+  x.fillStyle = ink; x.font = '600 300px "Newsreader", Georgia, serif'; x.fillText(R.score + "%", 80, 870);
+  const lv = LEVELS[R.level].name; x.font = '700 40px "Atkinson Hyperlegible", sans-serif';
+  const lw = x.measureText(lv).width + 56; x.fillStyle = levelCol[R.level];
+  x.beginPath(); x.roundRect(90, 920, lw, 70, 35); x.fill(); x.fillStyle = "#fff"; x.fillText(lv, 118, 968);
+  const rx = 90, rw = W - 180, ry = 1060;
+  [[0,25,"#2E7D5B"],[25,45,"#2346B8"],[45,65,"#A86A12"],[65,100,"#B23A3A"]].forEach(([a,b,col]) => { x.fillStyle = col; x.fillRect(rx + rw*a/100, ry, rw*(b-a)/100, 20); });
+  const px = rx + rw * R.score / 100; x.fillStyle = ink; x.beginPath(); x.moveTo(px, ry - 4); x.lineTo(px - 16, ry - 30); x.lineTo(px + 16, ry - 30); x.closePath(); x.fill();
+  x.fillStyle = muted; x.font = '400 30px "Atkinson Hyperlegible", sans-serif'; x.fillText("Take the 4-minute check: " + (location.host || "the AI reliance check"), 90, 1230);
+  return c;
+}
+function prepareCard(){ cardBlob = null; cardPromise = drawCard().then(c => new Promise(r => c.toBlob(b => { cardBlob = b; r(b); }, "image/png"))).catch(() => null); return cardPromise; }
+$("saveCard").onclick = async () => {
+  const b = cardBlob || await cardPromise; if(!b){ toast("Couldn't make the image in this browser."); return; }
+  const file = new File([b], "ai-reliance-check.png", {type:"image/png"});
+  if(matchMedia("(pointer: coarse)").matches && navigator.canShare && navigator.canShare({files:[file]})){
+    try { await navigator.share({files:[file]}); return; } catch(e){ if(e && e.name === "AbortError") return; }
+  }
+  const url = URL.createObjectURL(b), a = document.createElement("a");
+  a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000); toast("Image saved");
+};
+
+// keep a viewer's place if this page is updated while open in the artifact viewer
+window.claude?.hot?.snapshot?.(() => ({S}));
+function boot(data){
+  if(data && data.S && data.S.screen === "quiz"){ S = data.S; steps = buildSteps(S.setup); $("saveToggle").checked = S.save; show("quiz"); renderStep(); }
+}
+window.claude?.hot?.ready ? window.claude.hot.ready(boot) : boot(window.claude?.hot?.data ?? {});
+</script>
+</body>
+</html>
